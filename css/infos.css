@@ -30,11 +30,9 @@ ul.toggle_display li {
 #tabs ul#headers li a {
 	color:#595441;
 	border:1px solid #C7E7FF;
-	-moz-border-radius-topleft:10px;
-	-moz-border-radius-topright:10px;
-	-webkit-border-top-left-radius:10px;
-	-webkit-border-top-right-radius:10px;
-	border-radius:10px;
+	-moz-border-radius:10px 10px 0 0;
+	-webkit-border-radius:10px 10px 0 0;
+	border-radius:10px 10px 0 0;
 	padding:10px 5px 5px 15px;
 	background:#E3F3FF;
 }
@@ -54,11 +52,9 @@ ul.toggle_display li {
 }
 
 #stats_lines li a {
-	-moz-border-radius-topleft:10px;
-	-moz-border-radius-topright:10px;
-	-webkit-border-top-left-radius:10px;
-	-webkit-border-top-right-radius:10px;
-	border-radius:10px;
+	-moz-border-radius:10px 10px 0 0;
+	-webkit-border-radius:10px 10px 0 0;
+	border-radius:10px 10px 0 0;
 	padding:3px 10px;
 	background:#E3F3FF;
 	border:1px solid #C7E7FF;
@@ -84,7 +80,7 @@ li.sites_list img, #longurl img {width:16px; height: 16px; display:inline-block;
 
 #referrer_cell { min-width: 300px;}
 
-#details_clicks li.bestday {
+#details_clicks li.bestday, #details_clicks li span.best_month, #details_clicks li span.best_year    {
 	font-weight:bold;
 }
 
@@ -114,4 +110,7 @@ ul.no_bullet li {
 #historical_clicks span.historical_count {
 	min-width:100px;
 	display:inline-block;
+}
+h2#informations{
+	word-break: break-all;
 }

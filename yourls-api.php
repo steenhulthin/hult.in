@@ -1,53 +1,48 @@
 <?php
-define('YOURLS_API', true);
-require_once( dirname(__FILE__).'/includes/load-yourls.php' );
+/*
+ * YOURLS API
+ *
+ * Note about translation : this file should NOT be translation ready
+ * API messages and returns are supposed to be programmatically tested, so default English is expected
+ *
+ */
+
+define( 'YOURLS_API', true );
+require_once( dirname( __FILE__ ) . '/includes/load-yourls.php' );
 yourls_maybe_require_auth();
 
 $action = ( isset( $_REQUEST['action'] ) ? $_REQUEST['action'] : null );
 
 yourls_do_action( 'api', $action );
-	
-switch( $action ) {
 
-	// Shorten a URL
-	case 'shorturl':
-		$url = ( isset( $_REQUEST['url'] ) ? $_REQUEST['url'] : '' );
-		$keyword = ( isset( $_REQUEST['keyword'] ) ? $_REQUEST['keyword'] : '' );
-		$title = ( isset( $_REQUEST['title'] ) ? $_REQUEST['title'] : '' );
-		$return = yourls_add_new_link( $url, $keyword, $title );
-		$return['simple'] = ( isset( $return['shorturl'] ) ? $return['shorturl'] : '' ); // This one will be used in case output mode is 'simple'
-		unset( $return['html'] ); // in API mode, no need for our internal HTML output
-		break;
-	
-	// Global stats
-	case 'stats':
-		$filter = ( isset( $_REQUEST['filter'] ) ? $_REQUEST['filter'] : '' );
-		$limit = ( isset( $_REQUEST['limit'] ) ? $_REQUEST['limit'] : '' );
-		$return = yourls_api_stats( $filter, $limit );
-		break;
-	
-	// Stats for a shorturl
-	case 'url-stats':
-		$shorturl = ( isset( $_REQUEST['shorturl'] ) ? $_REQUEST['shorturl'] : '' );
-		$return = yourls_api_url_stats( $shorturl );
-		break;
+// Define standard API actions
+$api_actions = array(
+	'shorturl'  => 'yourls_api_action_shorturl',
+	'stats'     => 'yourls_api_action_stats',
+	'db-stats'  => 'yourls_api_action_db_stats',
+	'url-stats' => 'yourls_api_action_url_stats',
+	'expand'    => 'yourls_api_action_expand',
+	'version'   => 'yourls_api_action_version',
+);
+$api_actions = yourls_apply_filters( 'api_actions', $api_actions );
 
-	// Expand a short link
-	case 'expand':
-		$shorturl = ( isset( $_REQUEST['shorturl'] ) ? $_REQUEST['shorturl'] : '' );
-		$return = yourls_api_expand( $shorturl );
-		break;
-	
-	// Missing or incorrect action parameter
-	default:
-		$return = array(
-			'errorCode' => 400,
-			'message'   => 'Unknown or missing "action" parameter',
-			'simple'    => 'Unknown or missing "action" parameter',
-		);
-		
-
+// Register API actions
+foreach( (array) $api_actions as $_action => $_callback ) {
+	yourls_add_filter( 'api_action_' . $_action, $_callback, 99 );		
 }
+
+// Try requested API method. Properly registered actions should return an array.
+$return = yourls_apply_filter( 'api_action_' . $action, false );
+if ( false === $return ) {
+	$return = array(
+		'errorCode' => 400,
+		'message'   => 'Unknown or missing "action" parameter',
+		'simple'    => 'Unknown or missing "action" parameter',
+	);
+}
+
+if( isset( $_REQUEST['callback'] ) )
+	$return['callback'] = $_REQUEST['callback'];
 
 $format = ( isset( $_REQUEST['format'] ) ? $_REQUEST['format'] : 'xml' );
 

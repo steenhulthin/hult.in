@@ -1,6 +1,6 @@
 <?php
 /*************************************************************************/
-/* This class stores associative arrays in an xml formated string.       */
+/* This class stores associative arrays in an xml formatted string.       */
 /* There's also a function thar retrieves them. If you try to use        */ 
 /* xml2array with a general xml, it can fail, since there can be some    */
 /* repeated indexes....                                                  */
@@ -23,7 +23,14 @@ class yourls_array2xml {
 	//global $array_text;
 	foreach($array as $key => $value){
 	if(!is_array($value)){
-	 $this->text .= "<$key>".htmlentities( $value )."</$key>";
+	       //BEGIN code mod by Doug Vanderweide, 13 Jan 2011
+	       //does $value contain html entities?
+	       if(strlen($value) != strlen(htmlentities($value))) {
+	               //if so, encode as CDATA
+	               $value = "<![CDATA[" . htmlentities($value) . "]]>";
+	       }
+	       $this->text .= "<$key>$value</$key>";
+	       //END code mod
 	 } else {
 	 $this->text.="<$key>";
 	 $this->array_transform($value);
@@ -72,5 +79,3 @@ class yourls_array2xml {
 
 }//End of the class
 
-
-?>
